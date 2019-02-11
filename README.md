@@ -7,13 +7,14 @@ for the ultrasonic sensor. Since you are the electrical lead, I need you to assi
 v1.0 Alpha ^.^
 
 Finished/No Further Changes--
-lol none
+lol none 
 
 Currently Finished/May Need Tweaking--
 Ground movement. 
-Elevator Semi-automatic. 
 Intake System. 
 
 To Do List--
+Elevator Manual Mode. 
+Elevator Semi-automatic. 
 Add ultrasonic sensors. 
 Assign the proper motor IDS to their respective motor. 
