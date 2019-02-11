@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.commands.ElevatorAuto;
-import frc.robot.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.Spark;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.OI;
@@ -47,7 +46,8 @@ public class Robot extends TimedRobot {
 
   double SlowMode;
   double Totalforwardspeed = 0;
-  double TotalRotationspeed = 0;
+  double Totalrotationspeed = 0;
+  double Totalhorizontalspeed = 0;
   public static int CurrentElevLevel = 1;
 
   public static Spark IntakeWheel1 = new Spark(6);
@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_oi = new OI();
-    m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
+    m_chooser.setDefaultOption("Default Auto", new ElevatorAuto());
     // chooser.addOption("My Auto", new MyAutoCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     SmartDashboard.putData("Auto mode", m_chooser);
@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    
+    //Friendly reminder that robots will take over the world.
   }
 
   /**
@@ -87,6 +87,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+    Totalforwardspeed = 0;
+    Totalrotationspeed = 0;
+    Totalhorizontalspeed = 0;
+    CurrentElevLevel = 1;
+
   }
 
   @Override
@@ -155,22 +160,23 @@ public class Robot extends TimedRobot {
     boolean Quickturn = OI.xboxController.getRawButton(8);
     boolean ElevFall = OI.xboxController.getRawButtonPressed(0);
     boolean ElevRise = OI.xboxController.getRawButtonPressed(1);
-  
+
 
     //Insert controls with Axes here
     Totalforwardspeed = (lYVal / 2.5) + (rYVal / 4);
-    TotalRotationspeed = (rXVal / 4);
+    Totalrotationspeed = (rXVal / 4);
 
     if (SlowMode == true) {
       Totalforwardspeed = Totalforwardspeed * 0.1;
-      TotalRotationspeed = TotalRotationspeed * 0.1;
+      Totalrotationspeed = Totalrotationspeed * 0.15;
+      Totalhorizontalspeed = Totalhorizontalspeed * 0.05;
     }
     if (Quickturn == true) {
-      TotalRotationspeed = TotalRotationspeed * 1.5;
-      Totalforwardspeed = 0;
+      Totalrotationspeed = Totalrotationspeed * 1.5;
+      //Totalforwardspeed = 0;
     }
 
-    m_4drive.curvatureDrive(Totalforwardspeed,  TotalRotationspeed, Quickturn);
+    m_4drive.curvatureDrive(Totalforwardspeed,  Totalrotationspeed, Quickturn);
     m_hdrive.arcadeDrive((lXVal / 2), 0);
 
     if (ElevRise == true && CurrentElevLevel < 3) {
@@ -192,14 +198,12 @@ public class Robot extends TimedRobot {
       Robot.IntakeWheel2.set(0);
     }
     SmartDashboard.putNumber("Total Forward Speed", Totalforwardspeed);
-    SmartDashboard.putNumber("Total Rotation Speed", TotalRotationspeed);
+    SmartDashboard.putNumber("Total Rotation Speed", Totalrotationspeed);
     SmartDashboard.putBoolean("Fine Tuning Enabled?", SlowMode);
     SmartDashboard.putBoolean("Quickturning Enabled?", Quickturn);
     SmartDashboard.putNumber("Current Elevator Level", CurrentElevLevel);
     
   }
-
-  
 
   /**
    * This function is called periodically during test mode.
