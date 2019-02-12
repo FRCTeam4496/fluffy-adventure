@@ -18,3 +18,10 @@ Elevator Manual Mode.
 Elevator Semi-automatic. 
 Add ultrasonic sensors. 
 Assign the proper motor IDS to their respective motor. 
+
+Obligatory Robots quote:
+Fender: You consider me a friend?
+
+Rodney Copperbottom: Sure. What else would I consider you?
+
+Fender: I don't know. An embarrassment? A way to rebel against your parents? A desperate cry for help? The list is endless.
