@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import frc.robot.commands.ElevatorAuto;
 import edu.wpi.first.wpilibj.Spark;
+import frc.robot.commands.*;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.OI;
 
@@ -36,20 +36,19 @@ public class Robot extends TimedRobot {
 	SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
 
 	Spark m_frontRight = new Spark(3);
-	Spark m_rearRight = new Spark(4);
-  SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
-  
+  Spark m_rearRight = new Spark(4);
   Spark m_center = new Spark(5);
+  SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
+
+ 
 
   DifferentialDrive m_hdrive = new DifferentialDrive(m_center, m_center);
   DifferentialDrive m_4drive = new DifferentialDrive(m_left, m_right);
 
-  double SlowMode;
   double Totalforwardspeed = 0;
   double Totalrotationspeed = 0;
   double Totalhorizontalspeed = 0;
   public static int CurrentElevLevel = 1;
-
   public static Spark IntakeWheel1 = new Spark(6);
   public static Spark IntakeWheel2 = new Spark(7);
   public static Spark ElevatorMotor = new Spark(8);
@@ -161,7 +160,6 @@ public class Robot extends TimedRobot {
     boolean ElevFall = OI.xboxController.getRawButtonPressed(0);
     boolean ElevRise = OI.xboxController.getRawButtonPressed(1);
 
-
     //Insert controls with Axes here
     Totalforwardspeed = (lYVal / 2.5) + (rYVal / 4);
     Totalrotationspeed = (rXVal / 4);
@@ -180,12 +178,16 @@ public class Robot extends TimedRobot {
     m_hdrive.arcadeDrive((lXVal / 2), 0);
 
     if (ElevRise == true && CurrentElevLevel < 3) {
-        new ElevatorAuto();
+        //new ElevatorAuto();
+        new UltrasonicSensor();
         CurrentElevLevel++;
     }
     if (ElevFall == true && CurrentElevLevel > 1) {
-        new ElevatorAuto();
+        //new ElevatorAuto();
+        new UltrasonicSensor();
         CurrentElevLevel--;
+
+
     }
     if (OI.xboxController.getRawButtonPressed(5) == true) {
       Robot.IntakeWheel1.set(-0.2);
