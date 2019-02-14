@@ -1,10 +1,9 @@
 # Rodney the Radical Robit
 FRC Robot Code 2019
 Code being used for the robotics competition in 2019. 
-Patricia, since I know you are going to be busy working on cutting the metal and other stuff, I can probably implement the code
-for the ultrasonic sensor. Since you are the electrical lead, I need you to assign the proper motor IDs, thanks.
+Imagine making a Github page for robotics but it doesn't even matter. Some kid in a year will just steal the code anyway, and that's what I really work for, isn't it?
 
-v1.0 Alpha ^.^
+v1.1 Alpha (*x*)
 
 Finished/No Further Changes--
 lol none 
@@ -15,9 +14,12 @@ Intake System.
 
 To Do List--
 Elevator Manual Mode. 
-Elevator Semi-automatic. 
 Add ultrasonic sensors. 
 Assign the proper motor IDS to their respective motor. 
+
+Abandoned because I spent time on it and people had better ideas after I already made it--
+Elevator Semi-automatic.
+
 
 Obligatory Robots quote:
 
