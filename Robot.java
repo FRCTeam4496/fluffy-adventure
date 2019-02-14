@@ -13,8 +13,11 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Victor;
 import frc.robot.commands.*;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.OI;
@@ -49,9 +52,9 @@ public class Robot extends TimedRobot {
   double Totalrotationspeed = 0;
   double Totalhorizontalspeed = 0;
   public static int CurrentElevLevel = 1;
-  public static Spark IntakeWheel1 = new Spark(6);
-  public static Spark IntakeWheel2 = new Spark(7);
-  public static Spark ElevatorMotor = new Spark(8);
+  public static Talon IntakeWheel1 = new Talon(6);
+  public static Talon IntakeWheel2 = new Talon(7);
+  public static Victor ElevatorMotor = new Victor(8);
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -155,13 +158,15 @@ public class Robot extends TimedRobot {
     double lYVal = OI.xboxController.getRawAxis(1);
     double rXVal = OI.xboxController.getRawAxis(2);
     double rYVal = OI.xboxController.getRawAxis(3);
+    boolean ManualElevRise = OI.xboxController.getRawButton(5);
+    boolean ManualElevFall = OI.xboxController.getRawButton(6);
     boolean SlowMode = OI.xboxController.getRawButton(7);
     boolean Quickturn = OI.xboxController.getRawButton(8);
     boolean ElevFall = OI.xboxController.getRawButtonPressed(0);
     boolean ElevRise = OI.xboxController.getRawButtonPressed(1);
 
     //Insert controls with Axes here
-    Totalforwardspeed = (lYVal / 2.5) + (rYVal / 4);
+    Totalforwardspeed = (lYVal / 2.5);
     Totalrotationspeed = (rXVal / 4);
 
     if (SlowMode == true) {
@@ -189,16 +194,16 @@ public class Robot extends TimedRobot {
 
 
     }
-    if (OI.xboxController.getRawButtonPressed(5) == true) {
-      Robot.IntakeWheel1.set(-0.2);
-      Robot.IntakeWheel2.set(0.2);
-    } else if (OI.xboxController.getRawButtonPressed(6) == true) {
-      Robot.IntakeWheel1.set(0.2);
-      Robot.IntakeWheel2.set(-0.2);
+    IntakeWheel1.set(rYVal);
+    IntakeWheel2.set(-rYVal);
+    if (ManualElevRise == true && ManualElevFall == false) {
+      ElevatorMotor.set(0.8);
+    } else if (ManualElevRise == false && ManualElevFall == true) {
+      ElevatorMotor.set(0.02);
     } else {
-      Robot.IntakeWheel1.set(0);
-      Robot.IntakeWheel2.set(0);
+      ElevatorMotor.stopMotor();
     }
+
     SmartDashboard.putNumber("Total Forward Speed", Totalforwardspeed);
     SmartDashboard.putNumber("Total Rotation Speed", Totalrotationspeed);
     SmartDashboard.putBoolean("Fine Tuning Enabled?", SlowMode);
