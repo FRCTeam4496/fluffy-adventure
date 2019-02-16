@@ -13,10 +13,9 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Victor;
 import frc.robot.commands.*;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -34,19 +33,20 @@ public class Robot extends TimedRobot {
   public static OI m_oi;
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
-  Spark m_frontLeft = new Spark(1);
-	Spark m_rearLeft = new Spark(2);
-	SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
+  static Spark m_frontLeft = new Spark(0);
+	// static Spark m_rearLeft = new Spark(3);
+	// static SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
 
-	Spark m_frontRight = new Spark(3);
-  Spark m_rearRight = new Spark(4);
-  Spark m_center = new Spark(5);
-  SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
+	static Spark m_frontRight = new Spark(1);
+  // static Spark m_rearRight = new Spark(4);
+  // static SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
 
- 
+  static Talon m_center1 = new Talon(2);
+  static Talon m_center2 = new Talon(3);
+  static SpeedControllerGroup m_center = new SpeedControllerGroup(m_center1, m_center2);
 
-  DifferentialDrive m_hdrive = new DifferentialDrive(m_center, m_center);
-  DifferentialDrive m_4drive = new DifferentialDrive(m_left, m_right);
+  public static DifferentialDrive m_hdrive = new DifferentialDrive(m_center, m_center);
+  public static DifferentialDrive m_4drive = new DifferentialDrive(m_frontLeft, m_frontRight);
 
   double Totalforwardspeed = 0;
   double Totalrotationspeed = 0;
@@ -158,10 +158,10 @@ public class Robot extends TimedRobot {
     double lYVal = OI.xboxController.getRawAxis(1);
     double rXVal = OI.xboxController.getRawAxis(2);
     double rYVal = OI.xboxController.getRawAxis(3);
+    boolean ManualElevFall = OI.xboxController.getRawButton(4);
     boolean ManualElevRise = OI.xboxController.getRawButton(5);
-    boolean ManualElevFall = OI.xboxController.getRawButton(6);
-    boolean SlowMode = OI.xboxController.getRawButton(7);
-    boolean Quickturn = OI.xboxController.getRawButton(8);
+    boolean SlowMode = OI.xboxController.getRawButton(6);
+    boolean Quickturn = OI.xboxController.getRawButton(7);
     boolean ElevFall = OI.xboxController.getRawButtonPressed(0);
     boolean ElevRise = OI.xboxController.getRawButtonPressed(1);
 
@@ -194,8 +194,8 @@ public class Robot extends TimedRobot {
 
 
     }
-    IntakeWheel1.set(rYVal);
-    IntakeWheel2.set(-rYVal);
+    IntakeWheel1.set(Math.pow(rYVal, 3));
+    IntakeWheel2.set(-Math.pow(rYVal, 3));
     if (ManualElevRise == true && ManualElevFall == false) {
       ElevatorMotor.set(0.8);
     } else if (ManualElevRise == false && ManualElevFall == true) {
