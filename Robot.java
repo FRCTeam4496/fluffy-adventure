@@ -52,9 +52,14 @@ public class Robot extends TimedRobot {
   double Totalrotationspeed = 0;
   double Totalhorizontalspeed = 0;
   public static int CurrentElevLevel = 1;
+
   public static Talon IntakeWheel1 = new Talon(6);
   public static Talon IntakeWheel2 = new Talon(7);
-  public static Victor ElevatorMotor = new Victor(8);
+
+  public static Talon ElevatorMotor1 = new Talon(4);
+  public static Victor ElevatorMotor2 = new Victor(5);
+  public static SpeedControllerGroup ElevatorMotor = new SpeedControllerGroup(ElevatorMotor1, ElevatorMotor2);
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -158,21 +163,23 @@ public class Robot extends TimedRobot {
     double lYVal = OI.xboxController.getRawAxis(1);
     double rXVal = OI.xboxController.getRawAxis(2);
     double rYVal = OI.xboxController.getRawAxis(3);
-    boolean ManualElevFall = OI.xboxController.getRawButton(4);
-    boolean ManualElevRise = OI.xboxController.getRawButton(5);
-    boolean SlowMode = OI.xboxController.getRawButton(6);
-    boolean Quickturn = OI.xboxController.getRawButton(7);
+    boolean ManualElevFall = OI.xboxController.getRawButton(5);
+    boolean ManualElevRise = OI.xboxController.getRawButton(6);
+    boolean SlowMode = OI.xboxController.getRawButton(7);
+    boolean Quickturn = OI.xboxController.getRawButton(8);
     boolean ElevFall = OI.xboxController.getRawButtonPressed(0);
     boolean ElevRise = OI.xboxController.getRawButtonPressed(1);
 
+    m_center1.setSafetyEnabled(true);
+    m_center2.setSafetyEnabled(true);
     //Insert controls with Axes here
-    Totalforwardspeed = (lYVal / 2.5);
+    Totalforwardspeed = (-lYVal / 1.3);
     Totalrotationspeed = (rXVal / 4);
 
     if (SlowMode == true) {
-      Totalforwardspeed = Totalforwardspeed * 0.1;
-      Totalrotationspeed = Totalrotationspeed * 0.15;
-      Totalhorizontalspeed = Totalhorizontalspeed * 0.05;
+      Totalforwardspeed = Totalforwardspeed * 0.4;
+      Totalrotationspeed = Totalrotationspeed * 0.45;
+      Totalhorizontalspeed = Totalhorizontalspeed * 0.25;
     }
     if (Quickturn == true) {
       Totalrotationspeed = Totalrotationspeed * 1.5;
@@ -181,6 +188,7 @@ public class Robot extends TimedRobot {
 
     m_4drive.curvatureDrive(Totalforwardspeed,  Totalrotationspeed, Quickturn);
     m_hdrive.arcadeDrive((lXVal / 2), 0);
+    //m_center.set((lXVal / 2));
 
     if (ElevRise == true && CurrentElevLevel < 3) {
         //new ElevatorAuto();
@@ -199,16 +207,19 @@ public class Robot extends TimedRobot {
     if (ManualElevRise == true && ManualElevFall == false) {
       ElevatorMotor.set(0.8);
     } else if (ManualElevRise == false && ManualElevFall == true) {
-      ElevatorMotor.set(0.02);
+      ElevatorMotor.set(-0.8);
     } else {
       ElevatorMotor.stopMotor();
     }
 
     SmartDashboard.putNumber("Total Forward Speed", Totalforwardspeed);
     SmartDashboard.putNumber("Total Rotation Speed", Totalrotationspeed);
+    SmartDashboard.putNumber("Total Sideways Speed", Totalhorizontalspeed);
     SmartDashboard.putBoolean("Fine Tuning Enabled?", SlowMode);
     SmartDashboard.putBoolean("Quickturning Enabled?", Quickturn);
     SmartDashboard.putNumber("Current Elevator Level", CurrentElevLevel);
+    SmartDashboard.putBoolean("Manual Elevator Lift Enabled?", ManualElevRise);
+    SmartDashboard.putBoolean("Manual Elevator Fall Enabled?", ManualElevFall);
     
   }
 

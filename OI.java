@@ -43,7 +43,7 @@ public class OI {
   // until it is finished as determined by it's isFinished method.
   // button.whenReleased(new ExampleCommand());
 
-public static XboxController xboxController = new XboxController(1);
+public static XboxController xboxController = new XboxController(0);
 public static GenericHID.Hand kleft;
 public static GenericHID.Hand kright;
 public static boolean Abutton = xboxController.getAButton();
@@ -51,13 +51,9 @@ public static boolean Bbutton = xboxController.getBButton();
 public static boolean XButton = xboxController.getXButton();
 public static boolean YButton = xboxController.getYButton();
 public static int YAxis = xboxController.getAxisType(1);
-public static int XAxis = xboxController.getAxisType(0);
-public static double ZLTrigger = xboxController.getTriggerAxis(kleft);
-public static double ZRTrigger = xboxController.getTriggerAxis(kright);
-public static boolean LeftStickButton = xboxController.getStickButton(kleft);
-public static boolean RightStickButton = xboxController.getStickButton(kright);
+public static int XAxis = xboxController.getAxisType(2);
 public static boolean test = true;
-
+ 
 
 
 /* NINTENDO SWITCH PRO CONTROLLER MAPPING ^.^
