@@ -2,23 +2,22 @@
 FRC Robot Code 2019
 Code being used for the robotics competition in 2019. 
 
-v1.2 Alpha
+v1.5 Beta
 
 Finished/No Further Changes--
-lol none 
+Ground movement.
+Assign the proper motor IDs to their respective motor.
 
-Currently Finished/May Need Tweaking--
-Ground movement. 
+Currently Finished/May Need Tweaking-- 
 Intake System. 
-Assign the proper motor IDS to their respective motor.
 Elevator Manual Mode. 
 
 To Do List--
-Add ultrasonic sensors. 
+:)
 
 Abandoned because I spent time on it and people had better ideas after I already made it--
 Elevator Semi-automatic.
-
+Add ultrasonic sensors. 
 
 Obligatory Robots quote:
 

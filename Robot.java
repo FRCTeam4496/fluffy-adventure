@@ -15,9 +15,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Victor;
-import frc.robot.commands.*;
+//import frc.robot.commands.*;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.OI;
 
@@ -41,20 +43,21 @@ public class Robot extends TimedRobot {
   // static Spark m_rearRight = new Spark(4);
   // static SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
 
-  static Talon m_center1 = new Talon(2);
-  static Talon m_center2 = new Talon(3);
+  static Talon m_center1 = new Talon(3);
+  static Talon m_center2 = new Talon(6);
   static SpeedControllerGroup m_center = new SpeedControllerGroup(m_center1, m_center2);
 
-  public static DifferentialDrive m_hdrive = new DifferentialDrive(m_center, m_center);
   public static DifferentialDrive m_4drive = new DifferentialDrive(m_frontLeft, m_frontRight);
 
-  double Totalforwardspeed = 0;
+  double Forwardspeed = 0;
+  double Finalforwardspeed = 0;
   double Totalrotationspeed = 0;
-  double Totalhorizontalspeed = 0;
+  double Horizontalspeed = 0;
+  double Finalhorizontalspeed = 0;
   public static int CurrentElevLevel = 1;
 
-  public static Talon IntakeWheel1 = new Talon(6);
-  public static Talon IntakeWheel2 = new Talon(7);
+  public static Victor IntakeWheel1 = new Victor(9);
+  public static Victor IntakeWheel2 = new Victor(7);
 
   public static Talon ElevatorMotor1 = new Talon(4);
   public static Victor ElevatorMotor2 = new Victor(5);
@@ -67,8 +70,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_oi = new OI();
-    m_chooser.setDefaultOption("Default Auto", new ElevatorAuto());
-    // chooser.addOption("My Auto", new MyAutoCommand());
+
+    UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
+    //new UsbCamera("cam0", 0);
+    camera.setResolution(320, 240);
+    camera.setFPS(15);
+    // camera.setResolution(320, 240);
+    // camera.setFPS(15);
+    // // chooser.addOption("My Auto", new MyAutoCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     SmartDashboard.putData("Auto mode", m_chooser);
     
@@ -94,9 +103,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
-    Totalforwardspeed = 0;
+    Forwardspeed = 0;
     Totalrotationspeed = 0;
-    Totalhorizontalspeed = 0;
+    Horizontalspeed = 0;
     CurrentElevLevel = 1;
 
   }
@@ -129,6 +138,7 @@ public class Robot extends TimedRobot {
      */
 
     // schedule the autonomous command (example)
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.start();
     }
@@ -140,57 +150,39 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     Scheduler.getInstance().run();
-  }
-
-  @Override
-  public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
-  }
-
-  /**
-   * This function is called periodically during operator control.
-   */
-  @Override
-  public void teleopPeriodic() {
-
-    double lXVal = OI.xboxController.getRawAxis(0);
-    double lYVal = OI.xboxController.getRawAxis(1);
-    double rXVal = OI.xboxController.getRawAxis(2);
-    double rYVal = OI.xboxController.getRawAxis(3);
-    boolean ManualElevFall = OI.xboxController.getRawButton(5);
-    boolean ManualElevRise = OI.xboxController.getRawButton(6);
-    boolean SlowMode = OI.xboxController.getRawButton(7);
-    boolean Quickturn = OI.xboxController.getRawButton(8);
-    boolean ElevFall = OI.xboxController.getRawButtonPressed(0);
-    boolean ElevRise = OI.xboxController.getRawButtonPressed(1);
+    double lXVal = OI.joystickL.getRawAxis(0);
+    double lYVal = OI.joystickL.getRawAxis(1);
+    double rXVal = OI.joystickR.getRawAxis(0);
+    double rYVal = OI.joystickR.getRawAxis(1);
+    boolean IntakeIn = OI.joystickR.getRawButton(3);
+    boolean IntakeOut = OI.joystickR.getRawButton(2);
+    boolean SlowMode = OI.joystickL.getRawButton(1);
+    boolean ElevDisabled = OI.joystickR.getRawButton(1);
 
     m_center1.setSafetyEnabled(true);
     m_center2.setSafetyEnabled(true);
     //Insert controls with Axes here
-    Totalforwardspeed = (-lYVal / 1.3);
-    Totalrotationspeed = (rXVal / 4);
+    Forwardspeed = (-lYVal / 1.5);
+    Totalrotationspeed = (rXVal / 2.2);
+    Horizontalspeed = (-lXVal / 2);
 
     if (SlowMode == true) {
-      Totalforwardspeed = Totalforwardspeed * 0.4;
-      Totalrotationspeed = Totalrotationspeed * 0.45;
-      Totalhorizontalspeed = Totalhorizontalspeed * 0.25;
+      Forwardspeed = Forwardspeed * 0.55;
+      Totalrotationspeed = Totalrotationspeed * 0.55;
+      Horizontalspeed = Horizontalspeed * 0.7;
     }
-    if (Quickturn == true) {
-      Totalrotationspeed = Totalrotationspeed * 1.5;
-      //Totalforwardspeed = 0;
+    if (ElevDisabled == true) {
+      ElevatorMotor.set(-0.1);
+    } else {
+      ElevatorMotor.set(rYVal / 1.5);
     }
-
-    m_4drive.curvatureDrive(Totalforwardspeed,  Totalrotationspeed, Quickturn);
-    m_hdrive.arcadeDrive((lXVal / 2), 0);
+    Finalforwardspeed = (Forwardspeed + Finalforwardspeed * 10) / 11;
+    Finalhorizontalspeed = (Horizontalspeed + Finalhorizontalspeed * 10) / 11;
+    m_4drive.curvatureDrive(Finalforwardspeed,  Totalrotationspeed, true);
+    m_center.set(-Finalhorizontalspeed);
     //m_center.set((lXVal / 2));
 
-    if (ElevRise == true && CurrentElevLevel < 3) {
+/*     if (ElevRise == true && CurrentElevLevel < 3) {
         //new ElevatorAuto();
         new UltrasonicSensor();
         CurrentElevLevel++;
@@ -202,24 +194,117 @@ public class Robot extends TimedRobot {
 
 
     }
-    IntakeWheel1.set(Math.pow(rYVal, 3));
-    IntakeWheel2.set(-Math.pow(rYVal, 3));
-    if (ManualElevRise == true && ManualElevFall == false) {
-      ElevatorMotor.set(0.8);
-    } else if (ManualElevRise == false && ManualElevFall == true) {
-      ElevatorMotor.set(-0.8);
+     */
+    
+    if(IntakeIn == true & IntakeOut == false) {
+      IntakeWheel1.set(0.3);
+      IntakeWheel2.set(-0.3);
+    } else if(IntakeIn == false & IntakeOut == true) {
+      IntakeWheel2.set(0.8);
+      IntakeWheel1.set(-0.8);
     } else {
-      ElevatorMotor.stopMotor();
+      IntakeWheel1.set(0);
+      IntakeWheel2.set(0);
+    }
+  }
+
+  @Override
+  public void teleopInit() {
+    // This makes sure that the autonomous stops running when
+    // teleop starts running. If you want the autonomous to
+    // continue until interrupted by another command, remove
+    // this line or comment it out.
+
+
+     if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
     }
 
-    SmartDashboard.putNumber("Total Forward Speed", Totalforwardspeed);
+
+  }
+
+  /**
+   * This function is called periodically during operator control.
+   */
+  @Override
+  public void teleopPeriodic() {
+
+ /*    double lXVal = OI.xboxController.getRawAxis(0);
+    double lYVal = OI.xboxController.getRawAxis(1);
+    double rXVal = OI.xboxController.getRawAxis(2);
+    double rYVal = OI.xboxController.getRawAxis(3);
+    boolean ManualElevFall = OI.xboxController.getRawButton(5);
+    boolean ManualElevRise = OI.xboxController.getRawButton(6);
+    boolean SlowMode = OI.xboxController.getRawButton(7);
+    boolean Quickturn = OI.xboxController.getRawButton(8);
+    boolean ElevFall = OI.xboxController.getRawButtonPressed(0);
+    boolean ElevRise = OI.xboxController.getRawButtonPressed(1); */
+
+    double lXVal = OI.joystickL.getRawAxis(0);
+    double lYVal = OI.joystickL.getRawAxis(1);
+    double rXVal = OI.joystickR.getRawAxis(0);
+    double rYVal = OI.joystickR.getRawAxis(1);
+    boolean IntakeIn = OI.joystickR.getRawButton(3);
+    boolean IntakeOut = OI.joystickR.getRawButton(2);
+    boolean SlowMode = OI.joystickL.getRawButton(1);
+    boolean ElevDisabled = OI.joystickR.getRawButton(1);
+
+    m_center1.setSafetyEnabled(true);
+    m_center2.setSafetyEnabled(true);
+    //Insert controls with Axes here
+    Forwardspeed = (-lYVal / 1.5);
+    Totalrotationspeed = (rXVal / 2.6);
+    Horizontalspeed = (-lXVal / 2);
+
+    if (SlowMode == true) {
+      Forwardspeed = Forwardspeed * 0.55;
+      Totalrotationspeed = Totalrotationspeed * 0.55;
+      Horizontalspeed = Horizontalspeed * 0.7;
+    }
+    if (ElevDisabled == true) {
+      ElevatorMotor.set(-0.1);
+    } else {
+      ElevatorMotor.set(rYVal / 1.5);
+    }
+    Finalforwardspeed = (Forwardspeed + Finalforwardspeed * 10) / 11;
+    Finalhorizontalspeed = (Horizontalspeed + Finalhorizontalspeed * 10) / 11;
+    m_4drive.curvatureDrive(Finalforwardspeed,  Totalrotationspeed, true);
+    m_center.set(-Finalhorizontalspeed);
+    //m_center.set((lXVal / 2));
+
+/*     if (ElevRise == true && CurrentElevLevel < 3) {
+        //new ElevatorAuto();
+        new UltrasonicSensor();
+        CurrentElevLevel++;
+    }
+    if (ElevFall == true && CurrentElevLevel > 1) {
+        //new ElevatorAuto();
+        new UltrasonicSensor();
+        CurrentElevLevel--;
+
+
+    }
+     */
+    
+    if(IntakeIn == true & IntakeOut == false) {
+      IntakeWheel1.set(0.3);
+      IntakeWheel2.set(-0.3);
+    } else if(IntakeIn == false & IntakeOut == true) {
+      IntakeWheel2.set(0.8);
+      IntakeWheel1.set(-0.8);
+    } else {
+      IntakeWheel1.set(0);
+      IntakeWheel2.set(0);
+    }
+
+    SmartDashboard.putNumber("Total Forward Speed", Finalforwardspeed);
     SmartDashboard.putNumber("Total Rotation Speed", Totalrotationspeed);
-    SmartDashboard.putNumber("Total Sideways Speed", Totalhorizontalspeed);
+    SmartDashboard.putNumber("Total Sideways Speed", Finalhorizontalspeed);
     SmartDashboard.putBoolean("Fine Tuning Enabled?", SlowMode);
-    SmartDashboard.putBoolean("Quickturning Enabled?", Quickturn);
+    SmartDashboard.putBoolean("Elevator Disabled?", ElevDisabled);
     SmartDashboard.putNumber("Current Elevator Level", CurrentElevLevel);
-    SmartDashboard.putBoolean("Manual Elevator Lift Enabled?", ManualElevRise);
-    SmartDashboard.putBoolean("Manual Elevator Fall Enabled?", ManualElevFall);
+    SmartDashboard.putBoolean("Intake Out?", IntakeIn);
+    SmartDashboard.putBoolean("Intake In?", IntakeOut);
     
   }
 
